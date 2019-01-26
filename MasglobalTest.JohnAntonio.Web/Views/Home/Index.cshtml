@@ -1,31 +1,73 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Employees Page";
 }
 
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <h1>John Antonio delivery</h1>
+    <p class="lead">Please be sure the web server has access to <a href="http://masglobaltestapi.azurewebsites.net/api/">this</a> API</p>
 </div>
+<div id="employees-app">
+    <div class="row">
+        <div class="col-md-4">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label class="sr-only" for="exampleInputEmail3">Employee Id</label>
+                    <input type="text" v-model="employeeId" class="form-control" placeholder="Employee Id">
+                </div>
+                <button type="button" v-on:click="QueryEmployees" class="btn btn-success">Get Employees</button>
+            </form>
+        </div>
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <td><strong>Name</strong></td>
+                            <td><strong>Role name</strong></td>
+                            <td><strong>Annual salary</strong></td>
+                            <td><strong>Contract type name</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="employee in employees">
+                            <td>{{employee.Name}}</td>
+                            <td>{{employee.RoleName}}</td>
+                            <td>{{employee.AnnualSalary}}</td>
+                            <td>{{employee.ContractTypeName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let EmployeesApp = new Vue({
+        el: '#employees-app',
+        data: {
+            employeeId: '',
+            endpointUrl: '@Url.HttpRouteUrl("DefaultApi", new { controller = "Employees"})',
+            employees: []
+        },
+        methods: {
+            QueryEmployees: function (ev) {
+                let cApp = this;
+                if (this.employeeId == '') {
+                    $.ajax({ url: this.endpointUrl }).done(function (res) {cApp.employees = res; })
+                }
+                else if (parseInt(this.employeeId)) {
+                    this.employeeId = parseInt(this.employeeId);
+                    $.ajax({ url: this.endpointUrl + '/' + this.employeeId })
+                        .done(function (res) {
+                            cApp.employees = res;
+                        });
+                }
+                else ModalApp.ShowMessage("Employee Id must be an integer");
+            }
+        }
+    });
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+
+
+
+</script>
